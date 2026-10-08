@@ -61,7 +61,7 @@ module.exports = defineConfig({
 
     video: "on",
 
-    headless: false,
+    headless: !process.env.CI,
   },
 
   projects: [
