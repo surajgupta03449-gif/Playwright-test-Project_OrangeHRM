@@ -31,15 +31,16 @@ A ready-to-run Playwright JavaScript automation framework for the public OrangeH
 - TC04 Dashboard verification
 - TC05 Admin: open + search Admin user
 - TC06 PIM: open + add + search + delete employee
-- TC07 Leave: open + verify Leave List/search controls
-- TC08 My Info: open + verify Personal Details + Save
-- TC09 Time: open + verify breadcrumb
-- TC10 Recruitment: open + verify breadcrumb
-- TC11 Performance: open + verify breadcrumb
-- TC12 Directory: open + verify breadcrumb
-- TC13 Maintenance: open + verify breadcrumb
-- TC14 Claim: open + verify breadcrumb
-- TC15 Buzz: open + verify breadcrumb
+  TC07 - PIM: reset employee search
+- TC08 Leave: open + verify Leave List/search controls
+- TC09 My Info: open + verify Personal Details + Save
+- TC10 Time: open + verify breadcrumb
+- TC11 Recruitment: open + verify breadcrumb
+- TC12 Performance: open + verify breadcrumb
+- TC13 Directory: open + verify breadcrumb
+- TC14 Maintenance: open + verify breadcrumb
+- TC15 Claim: open + verify breadcrumb
+- TC16 Buzz: open + verify breadcrumb
 
 ## Important fixes from the first version
 
