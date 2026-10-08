@@ -1,0 +1,21 @@
+{
+  "name": "orangehrm-playwright-pom",
+  "version": "1.0.0",
+  "private": true,
+  "description": "OrangeHRM end-to-end automation framework using Playwright and Page Object Model",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:chromium": "playwright test --project=chromium",
+    "test:edge": "playwright test --project=Microsoft Edge",
+    "test:smoke": "playwright test tests/login.spec.js tests/dashboard.spec.js",
+    "test:pim": "playwright test tests/pim.spec.js",
+    "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui",
+    "report": "playwright show-report playwright-report",
+    "test:sections": "playwright test tests/dashboard.spec.js tests/admin.spec.js tests/pim.spec.js tests/leave.spec.js tests/myinfo.spec.js tests/sections.spec.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0"
+  }
+}

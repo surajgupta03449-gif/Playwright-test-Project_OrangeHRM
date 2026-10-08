@@ -1,0 +1,16 @@
+pipeline {
+  agent any
+  options { timestamps(); disableConcurrentBuilds() }
+  environment { CI = 'true'; BASE_URL = 'https://opensource-demo.orangehrmlive.com' }
+  stages {
+    stage('Checkout') { steps { checkout scm } }
+    stage('Install') { steps { sh 'npm install && npx playwright install --with-deps chromium' } }
+    stage('Test') { steps { sh 'npx playwright test --project=chromium' } }
+  }
+  post {
+    always {
+      archiveArtifacts artifacts: 'playwright-report/**,test-results/**,screenshots/**', allowEmptyArchive: true
+      junit testResults: 'test-results/results.xml', allowEmptyResults: true
+    }
+  }
+}
