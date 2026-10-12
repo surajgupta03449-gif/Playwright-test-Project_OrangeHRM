@@ -4,17 +4,14 @@ class PIMPage {
   constructor(page) {
     this.page = page;
 
-    // Navigation
     this.pimMenu = page.getByRole("link", { name: "PIM", exact: true });
 
-    // PIM list page
     this.employeeInformation = page.getByText("Employee Information", {
       exact: true,
     });
 
-    this.addButton = page.locator('button.oxd-button--secondary:has-text("Add")').first();
+    this.addButton = page.locator("button.oxd-button--secondary").filter({ hasText: "Add" }).first();
 
-    // Add Employee form
     this.firstName = page.getByPlaceholder("First Name");
     this.middleName = page.getByPlaceholder("Middle Name");
     this.lastName = page.getByPlaceholder("Last Name");
@@ -31,7 +28,6 @@ class PIMPage {
       exact: true,
     });
 
-    // Employee search
     this.employeeNameInput = page
       .locator(".oxd-input-group")
       .filter({ hasText: "Employee Name" })
@@ -48,10 +44,12 @@ class PIMPage {
       exact: true,
     });
 
-    // Employee table
-    this.tableRows = page.locator(".oxd-table-body .oxd-table-row");
+    this.tableBody = page.locator(".oxd-table-body");
+    this.tableRows = this.tableBody.locator(".oxd-table-row");
+    this.noRecordsMessage = page.getByText("No Records Found", {
+      exact: true,
+    });
 
-    // Toast
     this.successToast = page.locator(".oxd-toast--success");
 
     this.confirmDelete = page.getByRole("button", {
@@ -60,14 +58,12 @@ class PIMPage {
   }
 
   async open() {
-    await this.pimMenu.waitFor({
-      state: "visible",
-      timeout: 30000,
-    });
-
+    await this.pimMenu.waitFor({ state: "visible", timeout: 30000 });
     await this.pimMenu.click();
 
-    await this.page.waitForURL(/\/pim\/viewEmployeeList/, { timeout: 30000 });
+    await this.page.waitForURL(/\/pim\/viewEmployeeList/, {
+      timeout: 30000,
+    });
 
     await this.employeeInformation.waitFor({
       state: "visible",
@@ -76,27 +72,21 @@ class PIMPage {
   }
 
   async clickAdd() {
-    await this.addButton.waitFor({
-      state: "visible",
-      timeout: 30000,
-    });
-
+    await this.addButton.waitFor({ state: "visible", timeout: 30000 });
     await expect(this.addButton).toBeEnabled();
-
     await this.addButton.click();
 
-    await this.page.waitForURL(/\/pim\/addEmployee/, { timeout: 30000 });
-
-    await this.firstName.waitFor({
-      state: "visible",
+    await this.page.waitForURL(/\/pim\/addEmployee/, {
       timeout: 30000,
     });
+
+    await this.firstName.waitFor({ state: "visible", timeout: 30000 });
   }
 
   async enterEmployeeDetails(first, middle, last) {
     await this.firstName.fill(first);
 
-    if (middle && (await this.middleName.count()) > 0) {
+    if (middle) {
       await this.middleName.fill(middle);
     }
 
@@ -104,13 +94,8 @@ class PIMPage {
   }
 
   async saveEmployee() {
-    await this.saveButton.waitFor({
-      state: "visible",
-      timeout: 30000,
-    });
-
+    await this.saveButton.waitFor({ state: "visible", timeout: 30000 });
     await expect(this.saveButton).toBeEnabled();
-
     await this.saveButton.click();
 
     await this.personalDetails.waitFor({
@@ -136,40 +121,38 @@ class PIMPage {
 
     await this.employeeNameInput.fill(name);
 
-    // Allow OrangeHRM autocomplete to appear.
-    await this.page.waitForTimeout(1000);
-
     const option = this.page.getByRole("option").filter({ hasText: name }).first();
 
-    if (await option.isVisible().catch(() => false)) {
+    // Select a matching autocomplete suggestion when one appears.
+    try {
+      await option.waitFor({ state: "visible", timeout: 3000 });
       await option.click();
+    } catch {
+      // Some OrangeHRM versions allow submitting the typed name directly.
     }
 
     await this.searchButton.click();
 
-    await this.tableRows.first().waitFor({
+    await this.tableBody.waitFor({
       state: "visible",
-      timeout: 30000,
+      timeout: 15000,
     });
+
+    await expect(this.tableRows.first().or(this.noRecordsMessage)).toBeVisible({ timeout: 15000 });
   }
 
   async deleteEmployeeByName(name) {
     const row = this.tableRows.filter({ hasText: name }).first();
 
-    await row.waitFor({
-      state: "visible",
-      timeout: 30000,
-    });
+    await row.waitFor({ state: "visible", timeout: 15000 });
 
     const buttons = row.getByRole("button");
-
     const count = await buttons.count();
 
     if (count < 2) {
       throw new Error(`Expected edit/delete action buttons for employee: ${name}`);
     }
 
-    // Last action button = Delete
     await buttons.last().click();
 
     await this.confirmDelete.waitFor({
@@ -181,7 +164,7 @@ class PIMPage {
 
     await this.successToast.waitFor({
       state: "visible",
-      timeout: 30000,
+      timeout: 15000,
     });
   }
 }

@@ -18,18 +18,17 @@ test.describe("Authentication", () => {
     const login = new LoginPage(page);
 
     await login.goto();
-
     await login.attemptLogin(invalidUser.username, invalidUser.password);
 
-    await expect(login.errorMessage).toBeVisible();
-    await expect(login.errorMessage).toContainText("Invalid credentials");
+    await expect(page).toHaveURL(/\/auth\/login/);
+    await expect(login.errorMessage).toBeVisible({ timeout: 10000 });
+    await expect(login.errorMessage).toContainText(/invalid credentials/i);
   });
 
   test("TC03 - empty username/password validation", async ({ page }) => {
     const login = new LoginPage(page);
 
     await login.goto();
-
     await login.attemptLogin(emptyUser.username, emptyUser.password);
 
     await expect(login.requiredMessages).toHaveCount(2);
