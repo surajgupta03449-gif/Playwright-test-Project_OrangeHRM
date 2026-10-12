@@ -29,39 +29,70 @@
 //   ]
 // });
 
+// const { defineConfig, devices } = require("@playwright/test");
+
+// module.exports = defineConfig({
+//   testDir: "./tests",
+
+//   timeout: 60000,
+
+//   expect: {
+//     timeout: 15000,
+//   },
+
+//   fullyParallel: false,
+
+//   workers: 1,
+
+//   retries: 1,
+
+//   reporter: [["html", { open: "never" }], ["list"]],
+
+//   use: {
+//     baseURL: "https://opensource-demo.orangehrmlive.com",
+
+//     navigationTimeout: 60000,
+
+//     actionTimeout: 30000,
+
+//     trace: "on",
+
+//     screenshot: "on",
+
+//     video: "on",
+
+//     headless: !process.env.CI,
+//   },
+
+//   projects: [
+//     {
+//       name: "chromium",
+//       use: {
+//         ...devices["Desktop Chrome"],
+//       },
+//     },
+//   ],
+// });
+
 const { defineConfig, devices } = require("@playwright/test");
 
 module.exports = defineConfig({
   testDir: "./tests",
 
-  timeout: 60000,
-
-  expect: {
-    timeout: 15000,
-  },
-
   fullyParallel: false,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 1 : 0,
+  workers: process.env.CI ? 2 : undefined,
 
-  workers: 1,
-
-  retries: 1,
-
-  reporter: [["html", { open: "never" }], ["list"]],
+  reporter: [["list"], ["html", { outputFolder: "playwright-report", open: "never" }]],
 
   use: {
-    baseURL: "https://opensource-demo.orangehrmlive.com",
-
-    navigationTimeout: 60000,
-
-    actionTimeout: 30000,
-
-    trace: "on",
-
-    screenshot: "on",
-
-    video: "on",
-
-    headless: !process.env.CI,
+    baseURL: process.env.BASE_URL || "https://opensource-demo.orangehrmlive.com",
+    ...devices["Desktop Chrome"],
+    headless: !!process.env.CI,
+    screenshot: "only-on-failure",
+    trace: "retain-on-failure",
+    video: "retain-on-failure",
   },
 
   projects: [
