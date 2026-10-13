@@ -22,32 +22,45 @@ class LoginPage {
   }
 
   async goto() {
-    const url = "/web/index.php/auth/login";
+    const loginUrl = "/web/index.php/auth/login";
+    const usernameInput = this.page.getByPlaceholder("Username");
+
     let lastError;
 
-    for (let attempt = 1; attempt <= 3; attempt++) {
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      if (this.page.isClosed()) {
+        throw new Error("Cannot open login page: the browser page is already closed.");
+      }
+
       try {
-        await this.page.goto(url, {
+        await this.page.goto(loginUrl, {
           waitUntil: "domcontentloaded",
-          timeout: 60000,
+          timeout: 15000,
         });
 
-        await this.usernameInput.waitFor({
+        await usernameInput.waitFor({
           state: "visible",
-          timeout: 30000,
+          timeout: 8000,
         });
 
         return;
       } catch (error) {
         lastError = error;
 
-        if (attempt < 3) {
-          await this.page.waitForTimeout(3000);
+        if (this.page.isClosed()) {
+          throw new Error(`Login navigation failed because the page closed: ${error.message}`);
+        }
+
+        if (attempt === 2) {
+          break;
         }
       }
     }
 
-    throw lastError;
+    throw new Error(
+      `Could not open the OrangeHRM login page after 2 attempts. ` +
+        `Last error: ${lastError?.message || "Unknown navigation error"}`,
+    );
   }
 
   async enterUsername(username) {
