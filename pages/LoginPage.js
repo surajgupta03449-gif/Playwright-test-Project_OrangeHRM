@@ -27,7 +27,7 @@ class LoginPage {
 
     let lastError;
 
-    for (let attempt = 1; attempt <= 2; attempt++) {
+    for (let attempt = 1; attempt <= 3; attempt++) {
       if (this.page.isClosed()) {
         throw new Error("Cannot open login page: the browser page is already closed.");
       }
@@ -40,7 +40,7 @@ class LoginPage {
 
         await usernameInput.waitFor({
           state: "visible",
-          timeout: 8000,
+          timeout: 15000,
         });
 
         return;

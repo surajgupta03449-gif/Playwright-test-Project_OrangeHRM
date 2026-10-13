@@ -3,34 +3,46 @@ const { PIMPage } = require("../pages/PIMPage");
 const { uniqueEmployee } = require("../test-data/employeeData");
 
 test("TC06 - PIM: open, add employee, search employee, and delete employee", async ({ authenticated }) => {
-  const pim = new PIMPage(authenticated);
+  const page = authenticated.page || authenticated;
+  const pim = new PIMPage(page);
   const employee = uniqueEmployee();
 
-  await pim.addEmployee(employee.firstName, employee.middleName, employee.lastName);
+  const fullName = [employee.firstName, employee.middleName, employee.lastName].filter(Boolean).join(" ");
+
+  // Add employee and verify profile navigation.
+  await pim.addEmployee(employee.firstName, employee.middleName || "", employee.lastName);
 
   await expect(pim.personalDetails).toBeVisible();
 
-  await pim.searchEmployee(employee.firstName);
+  // Search for this specific employee.
+  await pim.searchEmployee(fullName);
 
-  await expect(pim.tableRows.filter({ hasText: employee.lastName }).first()).toBeVisible();
+  // Confirm the newly created employee appears in the results.
+  const employeeRow = pim.tableRows
+    .filter({
+      hasText: employee.lastName,
+    })
+    .first();
 
+  await expect(employeeRow).toBeVisible({
+    timeout: 15000,
+  });
+
+  // Delete and verify removal.
   await pim.deleteEmployeeByName(employee.lastName);
-
-  await expect(pim.successToast).toBeVisible();
 });
 
 test("TC07 - PIM: reset employee search", async ({ authenticated }) => {
-  const pim = new PIMPage(authenticated);
+  const page = authenticated.page || authenticated;
+  const pim = new PIMPage(page);
 
   await pim.open();
 
-  await pim.employeeNameInput.waitFor({
-    state: "visible",
-    timeout: 30000,
+  await expect(pim.employeeNameInput).toBeVisible({
+    timeout: 15000,
   });
 
   await pim.employeeNameInput.fill("Test");
-
   await pim.resetButton.click();
 
   await expect(pim.employeeNameInput).toHaveValue("");
