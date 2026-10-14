@@ -8,6 +8,9 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -46,3 +49,36 @@ jobs:
             test-results/
           if-no-files-found: warn
           retention-days: 14
+
+  deploy-report:
+    needs: test
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Download Playwright report artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: playwright-test-results
+          path: downloaded-results
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload HTML report for Pages
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: downloaded-results/playwright-report
+
+      - name: Deploy HTML report
+        id: deployment
+        uses: actions/deploy-pages@v4
