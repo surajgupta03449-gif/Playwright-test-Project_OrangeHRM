@@ -1,8 +1,15 @@
+
 {
-  "name": "orangehrm-playwright-pom",
+  "name": "@surajgupta03449-gif/orangehrm-playwright-pom",
   "version": "1.0.0",
-  "private": true,
   "description": "OrangeHRM end-to-end automation framework using Playwright and Page Object Model",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/surajgupta03449-gif/Playwright-test-Project_OrangeHRM.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "scripts": {
     "test": "playwright test",
     "test:headed": "playwright test --headed",
